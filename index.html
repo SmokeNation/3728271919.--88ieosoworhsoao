@@ -339,6 +339,16 @@
   socket.on('message', addMessage);
   socket.on('system', addSystem);
 
+  socket.on('clear', () => {
+    messagesEl.innerHTML = '';
+  });
+
+  socket.on('kicked', () => {
+    msgInput.disabled = true;
+    sendBtn.disabled = true;
+    msgInput.placeholder = 'You were removed from the chat';
+  });
+
   socket.on('userCount', (count) => {
     onlineCount.textContent = `${count} ONLINE`;
   });
