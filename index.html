@@ -135,6 +135,35 @@
     font-style:italic;
     padding:2px 0;
   }
+  .reactions{
+    display:flex;
+    gap:6px;
+    margin-top:6px;
+    flex-wrap:wrap;
+  }
+  .reaction-btn{
+    background:rgba(255,255,255,0.07);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:2px 8px;
+    font-size:12px;
+    color:var(--text-dim);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    transition:background 0.15s;
+    font-family:'Inter',sans-serif;
+  }
+  .reaction-btn:hover, .reaction-btn:active{
+    background:rgba(46,230,166,0.15);
+    border-color:rgba(46,230,166,0.3);
+  }
+  .reaction-btn .count{
+    font-size:11px;
+    color:var(--accent);
+    min-width:6px;
+  }
 
   /* Input */
   #composer{
@@ -278,6 +307,7 @@
   const onlineCount = document.getElementById('onlineCount');
 
   let username = '';
+  const REACTION_EMOJIS = ['👍', '🔥', '😂', '❤️'];
 
   function formatTime(ts){
     const d = new Date(ts);
@@ -287,12 +317,17 @@
   function addMessage(msg){
     const div = document.createElement('div');
     div.className = 'msg';
+    div.dataset.id = msg.id;
+    const reactions = msg.reactions || {};
     div.innerHTML = `
       <div class="meta">
         <span class="user">${msg.user}</span>
         <span class="time">${formatTime(msg.time)}</span>
       </div>
       <div class="text"></div>
+      <div class="reactions">
+        ${REACTION_EMOJIS.map(e => `<button class="reaction-btn" data-emoji="${e}">${e}<span class="count">${reactions[e] ? reactions[e] : ''}</span></button>`).join('')}
+      </div>
     `;
     div.querySelector('.text').textContent = msg.text;
     messagesEl.appendChild(div);
@@ -338,6 +373,21 @@
 
   socket.on('message', addMessage);
   socket.on('system', addSystem);
+
+  // Tap a reaction emoji to react to a message
+  messagesEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.reaction-btn');
+    if (!btn) return;
+    const msgDiv = btn.closest('.msg');
+    socket.emit('react', { messageId: Number(msgDiv.dataset.id), emoji: btn.dataset.emoji });
+  });
+
+  socket.on('reaction', ({ messageId, emoji, count }) => {
+    const msgDiv = messagesEl.querySelector(`.msg[data-id="${messageId}"]`);
+    if (!msgDiv) return;
+    const btn = msgDiv.querySelector(`.reaction-btn[data-emoji="${emoji}"]`);
+    if (btn) btn.querySelector('.count').textContent = count;
+  });
 
   socket.on('clear', () => {
     messagesEl.innerHTML = '';
