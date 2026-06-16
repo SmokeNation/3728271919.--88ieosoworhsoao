@@ -266,6 +266,7 @@ const announceText   = document.getElementById('announceText');
 const lockedBanner   = document.getElementById('lockedBanner');
 
 let username = '';
+let chatLocked = false;
 let announceTimer = null;
 const REACTION_EMOJIS = ['👍','🔥','😂','❤️'];
 const myReactions = {};
@@ -493,8 +494,6 @@ socket.on('announce', text => {
 socket.on('help', text => {
   text.split('\n').forEach(line => { if(line.trim()) addSystem(line); });
 });
-
-let chatLocked = false;
 </script>
 </body>
 </html>
