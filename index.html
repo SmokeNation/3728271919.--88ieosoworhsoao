@@ -10,8 +10,7 @@
 <style>
 :root{
   --bg:#0a0b0f;
-  --panel:#15171e;
-  --panel-2:#1b1e26;
+  --panel-bg:rgba(255,255,255,0.09);
   --border:rgba(255,255,255,0.07);
   --accent:#2EE6A6;
   --accent-dim:rgba(46,230,166,0.14);
@@ -25,6 +24,9 @@ html,body{height:100%;}
 body{
   margin:0;
   background:transparent;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
   color:var(--text);
   font-family:'Inter',sans-serif;
   display:flex;
@@ -32,6 +34,7 @@ body{
   height:100vh;
   height:100dvh;
   overflow:hidden;
+  transition:color 0.25s ease;
 }
 
 /* Header */
@@ -41,10 +44,11 @@ header{
   justify-content:space-between;
   padding:12px 16px;
   border-bottom:1px solid var(--border);
-  background:rgba(255,255,255,0.08);
+  background:var(--panel-bg);
   backdrop-filter:blur(10px);
   flex-shrink:0;
   position:relative;
+  transition:background 0.25s ease, border-color 0.25s ease;
 }
 .brand{display:flex;align-items:center;gap:8px;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.5px;}
 .brand .pk{color:var(--accent);}
@@ -62,8 +66,7 @@ header{
 
 /* Locked banner */
 #lockedBanner{
-  display:none;
-  align-items:center;justify-content:center;gap:8px;
+  display:none;align-items:center;justify-content:center;gap:8px;
   padding:8px 14px;
   background:rgba(255,71,87,0.12);
   border-bottom:1px solid rgba(255,71,87,0.25);
@@ -102,7 +105,7 @@ header{
   display:none;
   position:absolute;top:100%;right:12px;z-index:100;
   background:rgba(15,17,24,0.97);
-  border:1px solid var(--border);
+  border:1px solid rgba(255,255,255,0.08);
   border-radius:12px;padding:8px 0;
   min-width:180px;max-height:220px;overflow-y:auto;
   backdrop-filter:blur(12px);
@@ -112,11 +115,11 @@ header{
 .user-list-label{
   padding:6px 14px 4px;
   font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;
-  letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);
+  letter-spacing:1.5px;text-transform:uppercase;color:#8B93A1;
 }
 .user-list-item{
   display:flex;align-items:center;gap:8px;
-  padding:8px 14px;font-size:13px;color:var(--text);cursor:pointer;
+  padding:8px 14px;font-size:13px;color:#F2F3F5;cursor:pointer;
   transition:background 0.1s;
 }
 .user-list-item:hover{background:rgba(46,230,166,0.1);}
@@ -128,10 +131,11 @@ header{
 #messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 
 .msg{
-  background:rgba(255,255,255,0.09);backdrop-filter:blur(8px);
+  background:var(--panel-bg);backdrop-filter:blur(8px);
   border:1px solid var(--border);border-radius:var(--radius);
   padding:8px 12px;max-width:85%;align-self:flex-start;
   animation:fadeIn 0.2s ease;
+  transition:background 0.25s ease, border-color 0.25s ease;
 }
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 .msg .meta{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:2px;}
@@ -156,7 +160,7 @@ header{
 /* Health card */
 .health-card{
   align-self:stretch;
-  background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  background:var(--panel-bg);border:1px solid var(--border);
   border-radius:var(--radius);padding:12px 14px;
   animation:fadeIn 0.2s ease;
 }
@@ -165,6 +169,19 @@ header{
 .health-row:last-child{border-bottom:none;}
 .health-row .h-key{color:var(--text-dim);}
 .health-row .h-val{color:var(--text);font-weight:600;}
+
+/* Rules card */
+.rules-card{
+  align-self:stretch;
+  background:rgba(255,71,87,0.08);
+  border:1px solid rgba(255,71,87,0.25);
+  border-radius:var(--radius);padding:12px 14px;
+  animation:fadeIn 0.2s ease;
+}
+.rules-card .r-title{font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+.rules-card ul{margin:0;padding-left:18px;}
+.rules-card li{font-size:12px;line-height:1.6;color:var(--text);margin-bottom:4px;}
+.rules-card .r-foot{font-size:11px;color:var(--text-dim);margin-top:6px;font-style:italic;}
 
 /* Reactions */
 .reactions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
@@ -182,13 +199,15 @@ header{
 #composer{
   display:flex;gap:8px;padding:12px;
   border-top:1px solid var(--border);
-  background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);
+  background:var(--panel-bg);backdrop-filter:blur(10px);
   flex-shrink:0;
+  transition:background 0.25s ease, border-color 0.25s ease;
 }
 #msgInput{
-  flex:1;background:rgba(255,255,255,0.09);border:1px solid var(--border);
+  flex:1;background:var(--panel-bg);border:1px solid var(--border);
   border-radius:999px;padding:10px 16px;color:var(--text);
   font-size:13.5px;font-family:'Inter',sans-serif;outline:none;
+  transition:background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 #msgInput:focus{border-color:var(--accent);}
 #msgInput::placeholder{color:var(--text-dim);}
@@ -196,18 +215,18 @@ header{
 #sendBtn{
   background:var(--accent);color:#06241a;border:none;border-radius:999px;
   padding:0 18px;font-family:'Poppins',sans-serif;font-weight:700;
-  font-size:13px;cursor:pointer;transition:opacity 0.15s;
+  font-size:13px;cursor:pointer;transition:opacity 0.15s, background 0.25s ease;
 }
 #sendBtn:hover{opacity:0.85;}
 #sendBtn:disabled{opacity:0.4;cursor:default;}
 
 /* Join overlay */
 #joinOverlay{position:fixed;inset:0;background:rgba(8,9,12,0.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:10;}
-#joinCard{background:rgba(255,255,255,0.1);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:20px;padding:24px;width:85%;max-width:320px;text-align:center;}
-#joinCard h2{font-family:'Poppins',sans-serif;font-size:16px;margin:0 0 4px;}
+#joinCard{background:var(--panel-bg);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:20px;padding:24px;width:85%;max-width:320px;text-align:center;transition:background 0.25s ease,border-color 0.25s ease;}
+#joinCard h2{font-family:'Poppins',sans-serif;font-size:16px;margin:0 0 4px;color:var(--text);}
 #joinCard h2 .pk{color:var(--accent);}
 #joinCard p{color:var(--text-dim);font-size:12px;margin:0 0 16px;}
-#nameInput{width:100%;background:rgba(255,255,255,0.09);border:1px solid var(--border);border-radius:999px;padding:10px 16px;color:var(--text);font-size:13.5px;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;text-align:center;}
+#nameInput{width:100%;background:var(--panel-bg);border:1px solid var(--border);border-radius:999px;padding:10px 16px;color:var(--text);font-size:13.5px;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;text-align:center;}
 #nameInput:focus{border-color:var(--accent);}
 #joinBtn{width:100%;background:var(--accent);color:#06241a;border:none;border-radius:999px;padding:11px;font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
 .hidden{display:none !important;}
@@ -264,12 +283,37 @@ const pinnedText  = document.getElementById('pinnedText');
 const announceBanner = document.getElementById('announceBanner');
 const announceText   = document.getElementById('announceText');
 const lockedBanner   = document.getElementById('lockedBanner');
+const root = document.documentElement;
 
 let username = '';
 let chatLocked = false;
 let announceTimer = null;
 const REACTION_EMOJIS = ['👍','🔥','😂','❤️'];
 const myReactions = {};
+
+// ── Theme / transparency / background ────────────────────
+const THEME_PRESETS = {
+  dark:  { panelRGB:'10,11,15',  borderRGB:'255,255,255', borderAlpha:0.10, text:'#F2F3F5', textDim:'#8B93A1', accent:'#2EE6A6', accentDim:'rgba(46,230,166,0.14)' },
+  light: { panelRGB:'255,255,255', borderRGB:'0,0,0',     borderAlpha:0.10, text:'#1A1B1F', textDim:'#5B6270', accent:'#0EAE82', accentDim:'rgba(14,174,130,0.14)' }
+};
+
+function applyThemeConfig({ theme, transparency, background }){
+  const p = THEME_PRESETS[theme] || THEME_PRESETS.dark;
+  const alpha = Math.min(1, Math.max(0.03, transparency * 0.09));
+
+  root.style.setProperty('--panel-bg', `rgba(${p.panelRGB},${alpha})`);
+  root.style.setProperty('--border', `rgba(${p.borderRGB},${p.borderAlpha})`);
+  root.style.setProperty('--text', p.text);
+  root.style.setProperty('--text-dim', p.textDim);
+  root.style.setProperty('--accent', p.accent);
+  root.style.setProperty('--accent-dim', p.accentDim);
+
+  if (background){
+    document.body.style.backgroundImage = `url("${background}")`;
+  } else {
+    document.body.style.backgroundImage = 'none';
+  }
+}
 
 // ── Utilities ────────────────────────────────────────────
 function formatTime(ts){
@@ -355,6 +399,23 @@ function addHealthCard(data){
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
+function addRulesCard(){
+  const div = document.createElement('div');
+  div.className = 'rules-card';
+  div.innerHTML = `
+    <div class="r-title">📜 Chat Rules</div>
+    <ul>
+      <li>No swearing or slurs</li>
+      <li>Be respectful to all nationalities</li>
+      <li>No racism or discrimination of any kind</li>
+      <li>No spamming, flooding, or unsolicited links</li>
+    </ul>
+    <div class="r-foot">Auto-mod is active. Breaking these rules will result in a ban.</div>
+  `;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
 // ── Join ─────────────────────────────────────────────────
 joinBtn.addEventListener('click',()=>{
   const val = nameInput.value.trim();
@@ -375,7 +436,7 @@ function sendMessage(){
 sendBtn.addEventListener('click', sendMessage);
 msgInput.addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
 
-// ── Click username → @mention ────────────────────────────
+// ── Click username → @mention, tap reaction ──────────────
 messagesEl.addEventListener('click', e => {
   const userSpan = e.target.closest('.user[data-username]');
   if(userSpan){
@@ -386,7 +447,6 @@ messagesEl.addEventListener('click', e => {
     return;
   }
 
-  // Reactions
   const btn = e.target.closest('.reaction-btn');
   if(btn){
     const msgDiv = btn.closest('.msg');
@@ -411,8 +471,6 @@ document.addEventListener('click', e => {
 });
 
 function renderUserList(list){
-  const label = userListPanel.querySelector('.user-list-label');
-  // remove old items
   [...userListPanel.querySelectorAll('.user-list-item')].forEach(el=>el.remove());
   list.forEach(name => {
     const item = document.createElement('div');
@@ -437,6 +495,8 @@ socket.on('message', addMessage);
 socket.on('system', addSystem);
 socket.on('shoutout', addShoutout);
 socket.on('health', addHealthCard);
+socket.on('rules', addRulesCard);
+socket.on('themeConfig', applyThemeConfig);
 
 socket.on('reaction', ({ messageId, emoji, count }) => {
   const msgDiv = messagesEl.querySelector(`.msg[data-id="${messageId}"]`);
@@ -476,12 +536,13 @@ socket.on('unpin', () => {
   pinnedText.textContent = '';
 });
 
+// FIX: previously this disabled the entire input box while locked, which
+// meant admins couldn't type /unlock to undo it. The server now enforces
+// the lock (blocking regular messages, allowing commands through), so the
+// client just shows the banner — input stays usable so /unlock always works.
 socket.on('locked', isLocked => {
   chatLocked = isLocked;
   lockedBanner.classList.toggle('show', isLocked);
-  msgInput.disabled = isLocked;
-  sendBtn.disabled = isLocked;
-  if(!isLocked){ msgInput.disabled=false; sendBtn.disabled=false; }
 });
 
 socket.on('announce', text => {
