@@ -480,12 +480,25 @@ function addRulesCard(){
 // ── Join ─────────────────────────────────────────────────
 joinBtn.addEventListener('click',()=>{
   const val = nameInput.value.trim();
-  username = val || 'Guest';
-  socket.emit('join', username);
-  joinOverlay.classList.add('hidden');
-  msgInput.focus();
+  if(!val){ /* allow empty → Guest */ }
+  socket.emit('join', val || 'Guest');
+  // Don't hide yet — wait for nameAccepted / nameRejected from the server
 });
 nameInput.addEventListener('keydown',e=>{ if(e.key==='Enter') joinBtn.click(); });
+
+socket.on('nameAccepted', name => {
+  username = name;
+  joinOverlay.classList.add('hidden');
+  const p = document.querySelector('#joinCard p');
+  if(p){ p.style.color=''; p.textContent='Pick a name to join the live chat'; }
+  msgInput.focus();
+});
+
+socket.on('nameRejected', reason => {
+  const p = document.querySelector('#joinCard p');
+  if(p){ p.style.color='#ff4757'; p.textContent = reason; }
+  nameInput.focus();
+});
 
 // ── Send ─────────────────────────────────────────────────
 function sendMessage(){
