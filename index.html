@@ -49,6 +49,7 @@ header{
   backdrop-filter:blur(10px);
   flex-shrink:0;
   position:relative;
+  z-index:200;
   transition:background 0.25s ease, border-color 0.25s ease;
 }
 .brand{display:flex;align-items:center;gap:8px;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.5px;}
@@ -104,7 +105,7 @@ header{
 /* User list dropdown */
 #userListPanel{
   display:none;
-  position:absolute;top:100%;right:12px;z-index:100;
+  position:absolute;top:100%;right:12px;z-index:500;
   background:rgba(15,17,24,0.97);
   border:1px solid rgba(255,255,255,0.08);
   border-radius:12px;padding:8px 0;
@@ -196,27 +197,83 @@ header{
 .reaction-btn.reacted{background:rgba(46,230,166,0.2);border-color:var(--accent);}
 .reaction-btn .count{font-size:11px;color:var(--accent);min-width:6px;}
 
-/* Composer */
+/* Pinned message (in chat flow) */
+.msg.pinned{
+  border-color:rgba(46,230,166,0.4);
+  background:linear-gradient(135deg,rgba(46,230,166,0.1),var(--bubble-bg));
+}
+.msg.pinned .user{display:flex;align-items:center;gap:4px;}
+
+/* Poll card */
+.poll-card{
+  align-self:stretch;
+  background:var(--bubble-bg);border:1px solid rgba(46,230,166,0.3);
+  border-radius:var(--radius);padding:12px 14px;animation:fadeIn 0.2s ease;
+}
+.poll-card .p-q{font-family:'Poppins',sans-serif;font-weight:700;font-size:13.5px;color:var(--text);margin-bottom:10px;}
+.poll-opt{
+  position:relative;margin-bottom:7px;border:1px solid var(--border);
+  border-radius:10px;padding:8px 11px;cursor:pointer;overflow:hidden;
+  font-size:13px;color:var(--text);transition:border-color 0.15s;
+}
+.poll-opt:last-child{margin-bottom:0;}
+.poll-opt:hover{border-color:rgba(46,230,166,0.4);}
+.poll-opt.voted{border-color:var(--accent);}
+.poll-opt .p-fill{
+  position:absolute;left:0;top:0;bottom:0;width:0%;
+  background:rgba(46,230,166,0.15);transition:width 0.4s ease;z-index:0;
+}
+.poll-opt .p-label,.poll-opt .p-pct{position:relative;z-index:1;}
+.poll-opt .p-row{display:flex;justify-content:space-between;align-items:center;}
+.poll-opt .p-pct{font-size:12px;color:var(--accent);font-weight:600;}
+.poll-card .p-total{font-size:10.5px;color:var(--text-dim);margin-top:8px;text-align:right;}
+
+/* Countdown card */
+.countdown-card{
+  align-self:stretch;
+  background:linear-gradient(135deg,rgba(46,230,166,0.12),rgba(46,230,166,0.03));
+  border:1px solid rgba(46,230,166,0.3);border-radius:var(--radius);
+  padding:12px 14px;text-align:center;animation:fadeIn 0.2s ease;
+}
+.countdown-card .c-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
+.countdown-card .c-time{font-family:'Poppins',sans-serif;font-weight:700;font-size:20px;color:var(--accent);letter-spacing:1px;font-variant-numeric:tabular-nums;}
+
+/* Unlock schedule banner */
+#unlockBanner{
+  display:none;align-items:center;justify-content:center;gap:8px;
+  padding:8px 14px;
+  background:rgba(46,230,166,0.1);border-bottom:1px solid rgba(46,230,166,0.25);
+  color:var(--accent);font-size:12px;font-weight:600;flex-shrink:0;
+}
+#unlockBanner.show{display:flex;}
+
+/* Composer — WhatsApp-style compact bar */
 #composer{
-  display:flex;gap:8px;padding:12px;
+  display:flex;gap:6px;padding:6px 8px;
+  align-items:center;
   border-top:1px solid var(--border);
   background:var(--panel-bg);backdrop-filter:blur(10px);
   flex-shrink:0;
+  padding-bottom:max(6px, env(safe-area-inset-bottom));
   transition:background 0.25s ease, border-color 0.25s ease;
 }
 #msgInput{
   flex:1;background:var(--panel-bg);border:1px solid var(--border);
-  border-radius:999px;padding:10px 16px;color:var(--text);
-  font-size:13.5px;font-family:'Inter',sans-serif;outline:none;
+  border-radius:20px;padding:7px 14px;color:var(--text);
+  font-size:15px;line-height:1.2;font-family:'Inter',sans-serif;outline:none;
+  -webkit-appearance:none;
   transition:background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 #msgInput:focus{border-color:var(--accent);}
-#msgInput::placeholder{color:var(--text-dim);}
+#msgInput::placeholder{color:var(--text-dim);font-size:14px;}
 #msgInput:disabled{opacity:0.4;}
 #sendBtn{
-  background:var(--accent);color:#06241a;border:none;border-radius:999px;
-  padding:0 18px;font-family:'Poppins',sans-serif;font-weight:700;
-  font-size:13px;cursor:pointer;transition:opacity 0.15s, background 0.25s ease;
+  flex-shrink:0;
+  width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--accent);color:#06241a;border:none;border-radius:50%;
+  font-size:16px;cursor:pointer;padding:0;
+  transition:opacity 0.15s, background 0.25s ease;
 }
 #sendBtn:hover{opacity:0.85;}
 #sendBtn:disabled{opacity:0.4;cursor:default;}
@@ -256,14 +313,15 @@ header{
 </header>
 
 <div id="lockedBanner">🔒 Chat is locked — messages disabled</div>
+<div id="unlockBanner">⏳ <span id="unlockText"></span></div>
 <div id="pinnedBar"><span class="pin-icon">📌</span><div class="pin-text"><span class="pin-label">Pinned</span><span id="pinnedText"></span></div></div>
 <div id="announceBanner"><span class="announce-icon">📢</span><span class="announce-text" id="announceText"></span></div>
 
 <div id="messages"></div>
 
 <div id="composer">
-  <input id="msgInput" type="text" placeholder="Say something..." maxlength="500"/>
-  <button id="sendBtn">Send</button>
+  <input id="msgInput" type="text" placeholder="Message" maxlength="500"/>
+  <button id="sendBtn" aria-label="Send">➤</button>
 </div>
 
 <script>
@@ -348,7 +406,7 @@ function reactionCount(val){
 // ── Message rendering ────────────────────────────────────
 function addMessage(msg){
   const div = document.createElement('div');
-  div.className = 'msg';
+  div.className = 'msg' + (msg.isPin ? ' pinned' : '');
   div.dataset.id = msg.id;
   const reactions = msg.reactions || {};
   const mine = myReactions[msg.id];
@@ -558,6 +616,112 @@ socket.on('announce', text => {
 socket.on('help', text => {
   text.split('\n').forEach(line => { if(line.trim()) addSystem(line); });
 });
+
+// ── Poll ─────────────────────────────────────────────────
+let currentPollId = null;
+let myVote = null;
+
+function renderPoll(poll){
+  // remove any existing poll card so only one shows
+  const old = document.getElementById('pollCard');
+  if(old) old.remove();
+  if(!poll) return;
+  currentPollId = poll.id;
+  const total = poll.options.reduce((s,o)=>s+o.count,0);
+  const card = document.createElement('div');
+  card.className = 'poll-card';
+  card.id = 'pollCard';
+  card.innerHTML = `
+    <div class="p-q">📊 ${poll.question}</div>
+    ${poll.options.map((o,i)=>{
+      const pct = total>0 ? Math.round(o.count/total*100) : 0;
+      return `<div class="poll-opt${myVote===i?' voted':''}" data-idx="${i}">
+        <div class="p-fill" style="width:${pct}%"></div>
+        <div class="p-row"><span class="p-label">${o.label}</span><span class="p-pct">${pct}% · ${o.count}</span></div>
+      </div>`;
+    }).join('')}
+    <div class="p-total">${total} vote${total===1?'':'s'} · tap to vote</div>
+  `;
+  messagesEl.appendChild(card);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+socket.on('poll', poll => { renderPoll(poll); });
+socket.on('pollEnd', () => {
+  const old = document.getElementById('pollCard');
+  if(old) old.remove();
+  currentPollId = null; myVote = null;
+});
+
+// Vote by tapping an option
+messagesEl.addEventListener('click', e => {
+  const opt = e.target.closest('.poll-opt');
+  if(!opt || currentPollId===null) return;
+  const idx = Number(opt.dataset.idx);
+  myVote = idx;
+  socket.emit('pollVote', { pollId: currentPollId, optionIndex: idx });
+});
+
+// ── Countdown timer ──────────────────────────────────────
+let countdownData = null;
+
+function renderCountdown(){
+  const old = document.getElementById('countdownCard');
+  if(!countdownData){ if(old) old.remove(); return; }
+  const diff = countdownData.target - Date.now();
+  let card = old;
+  if(!card){
+    card = document.createElement('div');
+    card.className = 'countdown-card';
+    card.id = 'countdownCard';
+    messagesEl.appendChild(card);
+  }
+  let timeStr;
+  if(diff <= 0){
+    timeStr = 'LIVE NOW';
+  } else {
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor(diff%86400000/3600000);
+    const m = Math.floor(diff%3600000/60000);
+    const s = Math.floor(diff%60000/1000);
+    timeStr = (d>0?`${d}d `:'') + `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  card.innerHTML = `<div class="c-label">${countdownData.label}</div><div class="c-time">${timeStr}</div>`;
+}
+
+socket.on('countdown', data => {
+  countdownData = data;
+  renderCountdown();
+});
+
+// ── Unlock schedule timer ────────────────────────────────
+let unlockAt = null;
+const unlockBanner = document.getElementById('unlockBanner');
+const unlockText = document.getElementById('unlockText');
+
+function renderUnlock(){
+  if(unlockAt===null){ unlockBanner.classList.remove('show'); return; }
+  const diff = unlockAt - Date.now();
+  if(diff <= 0){ unlockBanner.classList.remove('show'); return; }
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor(diff%86400000/3600000);
+  const m = Math.floor(diff%3600000/60000);
+  const s = Math.floor(diff%60000/1000);
+  const t = (d>0?`${d}d `:'') + `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  unlockText.textContent = `Chat unlocks in ${t}`;
+  unlockBanner.classList.add('show');
+}
+
+socket.on('unlockSchedule', ts => {
+  unlockAt = ts;
+  renderUnlock();
+});
+
+// One shared 1s tick drives both countdown and unlock displays (low cost)
+setInterval(() => {
+  if(countdownData) renderCountdown();
+  if(unlockAt!==null) renderUnlock();
+}, 1000);
 </script>
 </body>
 </html>
