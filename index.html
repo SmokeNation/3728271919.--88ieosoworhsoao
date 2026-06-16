@@ -159,10 +159,44 @@
     background:rgba(46,230,166,0.15);
     border-color:rgba(46,230,166,0.3);
   }
+  .reaction-btn.reacted{
+    background:rgba(46,230,166,0.2);
+    border-color:var(--accent);
+  }
   .reaction-btn .count{
     font-size:11px;
     color:var(--accent);
     min-width:6px;
+  }
+
+  /* Pinned message bar */
+  #pinnedBar{
+    display:none;
+    align-items:flex-start;
+    gap:8px;
+    padding:10px 14px;
+    background:rgba(46,230,166,0.1);
+    border-bottom:1px solid rgba(46,230,166,0.25);
+    flex-shrink:0;
+  }
+  #pinnedBar.show{display:flex;}
+  #pinnedBar .pin-icon{font-size:13px;line-height:1.4;}
+  #pinnedBar .pin-text{
+    flex:1;
+    font-size:12.5px;
+    line-height:1.4;
+    color:var(--text);
+    word-break:break-word;
+  }
+  #pinnedBar .pin-label{
+    display:block;
+    font-family:'Poppins',sans-serif;
+    font-size:9px;
+    font-weight:600;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:2px;
   }
 
   /* Input */
@@ -285,6 +319,11 @@
     </div>
   </header>
 
+  <div id="pinnedBar">
+    <span class="pin-icon">📌</span>
+    <div class="pin-text"><span class="pin-label">Pinned</span><span id="pinnedText"></span></div>
+  </div>
+
   <div id="messages"></div>
 
   <div id="composer">
@@ -308,10 +347,18 @@
 
   let username = '';
   const REACTION_EMOJIS = ['👍', '🔥', '😂', '❤️'];
+  const myReactions = {}; // { messageId: Set(emoji) } — tracks what I've reacted to
 
   function formatTime(ts){
     const d = new Date(ts);
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function reactionCount(val){
+    // server stores arrays of usernames; support old number format too
+    if (Array.isArray(val)) return val.length;
+    if (typeof val === 'number') return val;
+    return 0;
   }
 
   function addMessage(msg){
@@ -319,6 +366,7 @@
     div.className = 'msg';
     div.dataset.id = msg.id;
     const reactions = msg.reactions || {};
+    const mine = myReactions[msg.id];
     div.innerHTML = `
       <div class="meta">
         <span class="user">${msg.user}</span>
@@ -326,7 +374,12 @@
       </div>
       <div class="text"></div>
       <div class="reactions">
-        ${REACTION_EMOJIS.map(e => `<button class="reaction-btn" data-emoji="${e}">${e}<span class="count">${reactions[e] ? reactions[e] : ''}</span></button>`).join('')}
+        ${REACTION_EMOJIS.map(e => {
+          const c = reactionCount(reactions[e]);
+          // mark reacted if I'm in the username list, or tracked locally
+          const reactedByMe = (Array.isArray(reactions[e]) && reactions[e].includes(username)) || (mine && mine.has(e));
+          return `<button class="reaction-btn${reactedByMe ? ' reacted' : ''}" data-emoji="${e}">${e}<span class="count">${c ? c : ''}</span></button>`;
+        }).join('')}
       </div>
     `;
     div.querySelector('.text').textContent = msg.text;
@@ -374,19 +427,30 @@
   socket.on('message', addMessage);
   socket.on('system', addSystem);
 
-  // Tap a reaction emoji to react to a message
+  // Tap a reaction emoji to react to a message (toggle)
   messagesEl.addEventListener('click', (e) => {
     const btn = e.target.closest('.reaction-btn');
     if (!btn) return;
     const msgDiv = btn.closest('.msg');
-    socket.emit('react', { messageId: Number(msgDiv.dataset.id), emoji: btn.dataset.emoji });
+    const id = Number(msgDiv.dataset.id);
+    const emoji = btn.dataset.emoji;
+    // track my toggle locally so the highlight state is correct immediately
+    if (!myReactions[id]) myReactions[id] = new Set();
+    if (myReactions[id].has(emoji)) {
+      myReactions[id].delete(emoji);
+      btn.classList.remove('reacted');
+    } else {
+      myReactions[id].add(emoji);
+      btn.classList.add('reacted');
+    }
+    socket.emit('react', { messageId: id, emoji });
   });
 
   socket.on('reaction', ({ messageId, emoji, count }) => {
     const msgDiv = messagesEl.querySelector(`.msg[data-id="${messageId}"]`);
     if (!msgDiv) return;
     const btn = msgDiv.querySelector(`.reaction-btn[data-emoji="${emoji}"]`);
-    if (btn) btn.querySelector('.count').textContent = count;
+    if (btn) btn.querySelector('.count').textContent = count ? count : '';
   });
 
   socket.on('clear', () => {
@@ -401,6 +465,28 @@
 
   socket.on('userCount', (count) => {
     onlineCount.textContent = `${count} ONLINE`;
+  });
+
+  // Pinned message bar
+  const pinnedBar = document.getElementById('pinnedBar');
+  const pinnedText = document.getElementById('pinnedText');
+
+  socket.on('pin', (pin) => {
+    pinnedText.textContent = pin.text;
+    pinnedBar.classList.add('show');
+  });
+
+  socket.on('unpin', () => {
+    pinnedBar.classList.remove('show');
+    pinnedText.textContent = '';
+  });
+
+  // /help output — render as a system-style multi-line block
+  socket.on('help', (text) => {
+    text.split('\n').forEach(line => {
+      if (line.trim() === '') return;
+      addSystem(line);
+    });
   });
 </script>
 </body>
